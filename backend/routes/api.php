@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ConsultationController;
 use App\Http\Controllers\API\MedecinController;
+use App\Http\Controllers\API\MedicalRecordController;
 use App\Http\Controllers\API\PatientController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +52,30 @@ Route::middleware('auth:sanctum')->prefix('appointments')->group(function () {
     Route::post('/', [AppointmentController::class, 'store']);
     Route::get('/{id}', [AppointmentController::class, 'show']);
     Route::post('/{id}/cancel', [AppointmentController::class, 'cancel']);
+});
+
+// Consultation routes (protected)
+Route::middleware('auth:sanctum')->prefix('consultations')->group(function () {
+    Route::get('/{id}', [ConsultationController::class, 'show']);
+    Route::put('/{id}/notes', [ConsultationController::class, 'updateNotes']);
+    Route::post('/{id}/prescriptions', [ConsultationController::class, 'createPrescription']);
+    Route::post('/{id}/report-issue', [ConsultationController::class, 'reportIssue']);
+    Route::post('/appointments/{id}/room', [ConsultationController::class, 'getRoomConfig']);
+    Route::post('/appointments/{id}/end', [ConsultationController::class, 'endConsultation']);
+});
+
+// Medical Record routes (protected)
+Route::middleware('auth:sanctum')->prefix('medical-records')->group(function () {
+    // Patient routes
+    Route::get('/my-record', [MedicalRecordController::class, 'show']);
+    Route::put('/my-record', [MedicalRecordController::class, 'update']);
+    Route::get('/consents', [MedicalRecordController::class, 'getConsents']);
+    Route::post('/consents', [MedicalRecordController::class, 'createConsent']);
+    Route::delete('/consents/{id}', [MedicalRecordController::class, 'revokeConsent']);
+    Route::get('/access-history', [MedicalRecordController::class, 'getAccessHistory']);
+
+    // Medecin routes
+    Route::get('/patients/{patientId}', [MedicalRecordController::class, 'access']);
 });
 
 // Health check

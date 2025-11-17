@@ -61,6 +61,24 @@ La plateforme répond aux enjeux critiques du système de santé tunisien :
 7. **Administration** - Backoffice complet, modération, analytics
 8. **Reporting** - KPIs temps réel, surveillance épidémiologique
 
+## ✨ Nouvelles Fonctionnalités (v1.1)
+
+### Frontend Complété
+- ✅ **Pages d'authentification** - Login, inscription patient, inscription médecin avec upload de documents
+- ✅ **Dashboards dynamiques** - Tableau de bord patient et médecin avec statistiques en temps réel
+- ✅ **Recherche de médecins** - Filtres avancés (spécialité, prix, note, localisation)
+- ✅ **Profil médecin** - Affichage complet avec avis, biographie, réservation
+- ✅ **Gestion rendez-vous** - Liste, détails, annulation avec politique de remboursement
+- ✅ **Système d'avis** - Évaluation détaillée sur 5 critères
+
+### Backend Enrichi
+- ✅ **Services PDF** - Génération d'ordonnances et factures avec QR codes
+- ✅ **Notifications SMS/Email** - Confirmations, rappels, annulations
+- ✅ **WebRTC Service** - Infrastructure vidéo pour téléconsultations
+- ✅ **API Consultations** - Gestion complète des consultations vidéo
+- ✅ **API Dossier Médical** - Accès sécurisé avec système de consentements
+- ✅ **API Prescriptions** - Création et génération PDF d'ordonnances
+
 ## 📦 Installation
 
 ### Prérequis
@@ -213,6 +231,27 @@ GET    /api/appointments            - Liste des rendez-vous
 POST   /api/appointments            - Créer un rendez-vous
 GET    /api/appointments/{id}       - Détails rendez-vous
 POST   /api/appointments/{id}/cancel - Annuler rendez-vous
+```
+
+#### Consultations (Nouveau)
+```
+GET    /api/consultations/{id}                    - Détails consultation
+PUT    /api/consultations/{id}/notes              - Mettre à jour notes (médecin)
+POST   /api/consultations/{id}/prescriptions      - Créer ordonnance
+POST   /api/consultations/{id}/report-issue       - Signaler problème technique
+POST   /api/consultations/appointments/{id}/room  - Obtenir config WebRTC
+POST   /api/consultations/appointments/{id}/end   - Terminer consultation
+```
+
+#### Dossier Médical (Nouveau)
+```
+GET    /api/medical-records/my-record             - Mon dossier médical (patient)
+PUT    /api/medical-records/my-record             - Mettre à jour dossier
+GET    /api/medical-records/consents              - Mes consentements
+POST   /api/medical-records/consents              - Créer consentement
+DELETE /api/medical-records/consents/{id}         - Révoquer consentement
+GET    /api/medical-records/access-history        - Historique d'accès
+GET    /api/medical-records/patients/{id}         - Accéder au dossier (médecin)
 ```
 
 #### Health Check
