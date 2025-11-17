@@ -50,6 +50,24 @@ const routes: RouteRecordRaw[] = [
     name: 'AppointmentDetail',
     component: () => import('@/views/appointments/AppointmentDetail.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/consultations/:appointmentId',
+    name: 'VideoConsultation',
+    component: () => import('@/views/consultations/VideoConsultationPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/messages',
+    name: 'Messages',
+    component: () => import('@/views/messages/MessagesPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('@/views/admin/AdminDashboard.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 
@@ -64,6 +82,8 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
+  } else if (to.meta.requiresAdmin && authStore.user?.role !== 'admin') {
+    next({ name: 'Dashboard' })
   } else {
     next()
   }

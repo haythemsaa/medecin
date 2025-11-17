@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ConsultationController;
 use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
+use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\PatientController;
 use Illuminate\Support\Facades\Route;
 
@@ -76,6 +78,26 @@ Route::middleware('auth:sanctum')->prefix('medical-records')->group(function () 
 
     // Medecin routes
     Route::get('/patients/{patientId}', [MedicalRecordController::class, 'access']);
+});
+
+// Admin routes (protected)
+Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard']);
+    Route::get('/medecins/pending', [AdminController::class, 'getPendingValidations']);
+    Route::get('/medecins/{id}', [AdminController::class, 'getMedecinForValidation']);
+    Route::post('/medecins/{id}/validate', [AdminController::class, 'validateMedecin']);
+    Route::get('/users', [AdminController::class, 'getUsers']);
+    Route::put('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
+    Route::get('/statistics', [AdminController::class, 'getStatistics']);
+});
+
+// Messages routes (protected)
+Route::middleware('auth:sanctum')->prefix('messages')->group(function () {
+    Route::get('/conversations', [MessageController::class, 'getConversations']);
+    Route::post('/conversations', [MessageController::class, 'createConversation']);
+    Route::get('/conversations/{id}/messages', [MessageController::class, 'getMessages']);
+    Route::post('/conversations/{id}/messages', [MessageController::class, 'sendMessage']);
+    Route::get('/unread-count', [MessageController::class, 'getUnreadCount']);
 });
 
 // Health check
