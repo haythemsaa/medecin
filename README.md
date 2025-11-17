@@ -61,23 +61,58 @@ La plateforme répond aux enjeux critiques du système de santé tunisien :
 7. **Administration** - Backoffice complet, modération, analytics
 8. **Reporting** - KPIs temps réel, surveillance épidémiologique
 
-## ✨ Nouvelles Fonctionnalités (v1.1)
+## ✨ Nouvelles Fonctionnalités (v1.2)
 
 ### Frontend Complété
+
+**Authentification & Accueil**
+- ✅ **Page d'accueil** - Landing page complète avec présentation des fonctionnalités
 - ✅ **Pages d'authentification** - Login, inscription patient, inscription médecin avec upload de documents
+- ✅ **Navigation globale** - Barre de navigation responsive avec menu utilisateur et notifications
 - ✅ **Dashboards dynamiques** - Tableau de bord patient et médecin avec statistiques en temps réel
+
+**Fonctionnalités Patients**
 - ✅ **Recherche de médecins** - Filtres avancés (spécialité, prix, note, localisation)
 - ✅ **Profil médecin** - Affichage complet avec avis, biographie, réservation
 - ✅ **Gestion rendez-vous** - Liste, détails, annulation avec politique de remboursement
+- ✅ **Dossier médical** - Gestion complète avec allergies, maladies chroniques, traitements
+- ✅ **Contrôle d'accès** - Système de consentements et historique des accès
+- ✅ **Ordonnances** - Visualisation, filtres, téléchargement PDF avec QR code
+- ✅ **Profil patient** - Édition complète des informations personnelles et santé
 - ✅ **Système d'avis** - Évaluation détaillée sur 5 critères
+
+**Fonctionnalités Médecins**
+- ✅ **Profil professionnel** - Gestion complète des informations médicales et cabinet
+- ✅ **Notes de consultation** - Interface complète avec signes vitaux et diagnostic
+- ✅ **Création d'ordonnances** - Multi-médicaments avec génération PDF automatique
+- ✅ **Historique médical** - Accès au dossier patient avec consentement
+- ✅ **Statistiques** - Vue d'ensemble des consultations et revenus
+
+**Fonctionnalités Admin**
+- ✅ **Dashboard admin** - Validation des médecins, gestion des utilisateurs
+- ✅ **Statistiques globales** - Analytics et KPIs en temps réel
+- ✅ **Messagerie sécurisée** - Chat chiffré E2E entre patients et médecins
+- ✅ **Notifications** - Système de toast pour les alertes
+
+**Composants Réutilisables**
+- ✅ **LoadingSpinner** - Indicateur de chargement configurable
+- ✅ **Modal** - Fenêtre modale responsive avec slots
+- ✅ **Card** - Composant carte flexible pour l'affichage
+- ✅ **Badge** - Badges de statut avec variantes de couleurs
+- ✅ **Button** - Bouton avec états loading et variantes
+- ✅ **EmptyState** - État vide personnalisable
+- ✅ **ToastNotification** - Notifications toast avec animations
 
 ### Backend Enrichi
 - ✅ **Services PDF** - Génération d'ordonnances et factures avec QR codes
 - ✅ **Notifications SMS/Email** - Confirmations, rappels, annulations
 - ✅ **WebRTC Service** - Infrastructure vidéo pour téléconsultations
-- ✅ **API Consultations** - Gestion complète des consultations vidéo
+- ✅ **API Consultations** - Gestion complète des consultations vidéo avec notes
 - ✅ **API Dossier Médical** - Accès sécurisé avec système de consentements
-- ✅ **API Prescriptions** - Création et génération PDF d'ordonnances
+- ✅ **API Prescriptions** - Création, visualisation et téléchargement PDF
+- ✅ **API Admin** - Dashboard, validation médecins, statistiques
+- ✅ **API Messages** - Messagerie chiffrée E2E
+- ✅ **PrescriptionController** - Gestion complète des ordonnances avec vérification QR
 
 ## 📦 Installation
 
@@ -243,7 +278,7 @@ POST   /api/consultations/appointments/{id}/room  - Obtenir config WebRTC
 POST   /api/consultations/appointments/{id}/end   - Terminer consultation
 ```
 
-#### Dossier Médical (Nouveau)
+#### Dossier Médical
 ```
 GET    /api/medical-records/my-record             - Mon dossier médical (patient)
 PUT    /api/medical-records/my-record             - Mettre à jour dossier
@@ -252,6 +287,35 @@ POST   /api/medical-records/consents              - Créer consentement
 DELETE /api/medical-records/consents/{id}         - Révoquer consentement
 GET    /api/medical-records/access-history        - Historique d'accès
 GET    /api/medical-records/patients/{id}         - Accéder au dossier (médecin)
+```
+
+#### Ordonnances (Nouveau)
+```
+GET    /api/prescriptions/my-prescriptions        - Mes ordonnances (patient)
+GET    /api/prescriptions/medecin-prescriptions   - Mes ordonnances (médecin)
+GET    /api/prescriptions/{id}                    - Détails d'une ordonnance
+GET    /api/prescriptions/{id}/download           - Télécharger PDF
+POST   /api/prescriptions/verify                  - Vérifier ordonnance par QR
+```
+
+#### Administration (Nouveau)
+```
+GET    /api/admin/dashboard                       - Dashboard admin
+GET    /api/admin/medecins/pending                - Médecins en attente
+GET    /api/admin/medecins/{id}                   - Détails médecin
+POST   /api/admin/medecins/{id}/validate          - Valider/rejeter médecin
+GET    /api/admin/users                           - Liste utilisateurs
+PUT    /api/admin/users/{id}/status               - Modifier statut utilisateur
+GET    /api/admin/statistics                      - Statistiques globales
+```
+
+#### Messages (Nouveau)
+```
+GET    /api/messages/conversations                - Mes conversations
+POST   /api/messages/conversations                - Créer conversation
+GET    /api/messages/conversations/{id}/messages  - Messages d'une conversation
+POST   /api/messages/conversations/{id}/messages  - Envoyer message
+GET    /api/messages/unread-count                 - Nombre de messages non lus
 ```
 
 #### Health Check
@@ -311,10 +375,32 @@ medecin/
 ├── frontend/                   # Application Vue.js
 │   ├── src/
 │   │   ├── components/        # Composants réutilisables
+│   │   │   ├── Badge.vue
+│   │   │   ├── Button.vue
+│   │   │   ├── Card.vue
+│   │   │   ├── EmptyState.vue
+│   │   │   ├── LoadingSpinner.vue
+│   │   │   ├── Modal.vue
+│   │   │   ├── NavigationBar.vue
+│   │   │   ├── ToastNotification.vue
+│   │   │   └── VideoConsultation.vue
 │   │   ├── views/             # Pages
+│   │   │   ├── auth/          # Pages d'authentification
+│   │   │   ├── admin/         # Administration
+│   │   │   ├── appointments/  # Rendez-vous
+│   │   │   ├── consultations/ # Consultations
+│   │   │   ├── medecins/      # Médecins
+│   │   │   ├── medical-records/ # Dossiers médicaux
+│   │   │   ├── messages/      # Messagerie
+│   │   │   ├── prescriptions/ # Ordonnances
+│   │   │   ├── profile/       # Profils utilisateurs
+│   │   │   ├── DashboardPage.vue
+│   │   │   └── HomePage.vue
+│   │   ├── composables/       # Composables Vue
 │   │   ├── stores/            # Stores Pinia
 │   │   ├── services/          # Services API
 │   │   ├── router/            # Configuration routeur
+│   │   ├── utils/             # Utilitaires
 │   │   └── types/             # Types TypeScript
 │   └── package.json
 │
