@@ -5,17 +5,20 @@ use App\Http\Controllers\API\AnalyticsController;
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AvailabilityController;
+use App\Http\Controllers\API\CalendarIntegrationController;
 use App\Http\Controllers\API\ConsultationController;
 use App\Http\Controllers\API\ExportController;
 use App\Http\Controllers\API\FavoriteController;
 use App\Http\Controllers\API\FileController;
 use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
+use App\Http\Controllers\API\MedicationReminderController;
 use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PatientController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PrescriptionController;
+use App\Http\Controllers\API\QuestionnaireController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -201,6 +204,38 @@ Route::middleware('auth:sanctum')->prefix('favorites')->group(function () {
     Route::put('/{id}', [FavoriteController::class, 'update']);
     Route::delete('/{id}', [FavoriteController::class, 'destroy']);
     Route::get('/check/{medecinId}', [FavoriteController::class, 'check']);
+});
+
+// Questionnaire routes (protected)
+Route::middleware('auth:sanctum')->prefix('questionnaires')->group(function () {
+    Route::get('/templates', [QuestionnaireController::class, 'getTemplates']);
+    Route::get('/appointments/{appointmentId}', [QuestionnaireController::class, 'getForAppointment']);
+    Route::post('/submit', [QuestionnaireController::class, 'submit']);
+    Route::post('/{id}/mark-reviewed', [QuestionnaireController::class, 'markReviewed']);
+    Route::get('/medecin/all', [QuestionnaireController::class, 'getMedecinQuestionnaires']);
+});
+
+// Medication Reminder routes (protected)
+Route::middleware('auth:sanctum')->prefix('medication-reminders')->group(function () {
+    Route::get('/', [MedicationReminderController::class, 'index']);
+    Route::post('/', [MedicationReminderController::class, 'store']);
+    Route::put('/{id}', [MedicationReminderController::class, 'update']);
+    Route::delete('/{id}', [MedicationReminderController::class, 'destroy']);
+    Route::post('/intake/record', [MedicationReminderController::class, 'recordIntake']);
+    Route::get('/{id}/intake-history', [MedicationReminderController::class, 'getIntakeHistory']);
+    Route::get('/{id}/adherence-stats', [MedicationReminderController::class, 'getAdherenceStats']);
+});
+
+// Calendar Integration routes (protected)
+Route::middleware('auth:sanctum')->prefix('calendar')->group(function () {
+    Route::get('/status', [CalendarIntegrationController::class, 'getStatus']);
+    Route::get('/google/auth-url', [CalendarIntegrationController::class, 'getGoogleAuthUrl']);
+    Route::get('/outlook/auth-url', [CalendarIntegrationController::class, 'getOutlookAuthUrl']);
+    Route::post('/google/callback', [CalendarIntegrationController::class, 'handleGoogleCallback']);
+    Route::post('/outlook/callback', [CalendarIntegrationController::class, 'handleOutlookCallback']);
+    Route::post('/google/disconnect', [CalendarIntegrationController::class, 'disconnectGoogle']);
+    Route::post('/outlook/disconnect', [CalendarIntegrationController::class, 'disconnectOutlook']);
+    Route::post('/auto-sync', [CalendarIntegrationController::class, 'toggleAutoSync']);
 });
 
 // Health check

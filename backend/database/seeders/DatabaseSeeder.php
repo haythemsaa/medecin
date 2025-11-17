@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             AppointmentSeeder::class,
+            QuestionnaireTemplateSeeder::class,
         ]);
 
         $this->command->info('');
