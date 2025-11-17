@@ -10,6 +10,7 @@ use App\Http\Controllers\API\ConsultationController;
 use App\Http\Controllers\API\ExportController;
 use App\Http\Controllers\API\FavoriteController;
 use App\Http\Controllers\API\FileController;
+use App\Http\Controllers\API\GeolocationController;
 use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
 use App\Http\Controllers\API\MedicationReminderController;
@@ -18,9 +19,11 @@ use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PatientController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PrescriptionController;
+use App\Http\Controllers\API\PrescriptionRenewalController;
 use App\Http\Controllers\API\QuestionnaireController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SearchController;
+use App\Http\Controllers\API\UrgentConsultationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -236,6 +239,37 @@ Route::middleware('auth:sanctum')->prefix('calendar')->group(function () {
     Route::post('/google/disconnect', [CalendarIntegrationController::class, 'disconnectGoogle']);
     Route::post('/outlook/disconnect', [CalendarIntegrationController::class, 'disconnectOutlook']);
     Route::post('/auto-sync', [CalendarIntegrationController::class, 'toggleAutoSync']);
+});
+
+// Urgent Consultation routes (protected)
+Route::middleware('auth:sanctum')->prefix('urgent-consultations')->group(function () {
+    Route::get('/available', [UrgentConsultationController::class, 'getAvailableDoctors']);
+    Route::post('/request', [UrgentConsultationController::class, 'requestUrgent']);
+    Route::post('/{appointmentId}/accept', [UrgentConsultationController::class, 'acceptUrgent']);
+    Route::get('/stats', [UrgentConsultationController::class, 'getStats']);
+    Route::post('/toggle-availability', [UrgentConsultationController::class, 'toggleAvailability']);
+});
+
+// Prescription Renewal routes (protected)
+Route::middleware('auth:sanctum')->prefix('prescription-renewals')->group(function () {
+    Route::get('/renewable', [PrescriptionRenewalController::class, 'getRenewablePrescriptions']);
+    Route::post('/request', [PrescriptionRenewalController::class, 'requestRenewal']);
+    Route::get('/pending', [PrescriptionRenewalController::class, 'getPendingRenewals']);
+    Route::post('/{renewalId}/approve', [PrescriptionRenewalController::class, 'approveRenewal']);
+    Route::post('/{renewalId}/reject', [PrescriptionRenewalController::class, 'rejectRenewal']);
+    Route::get('/history', [PrescriptionRenewalController::class, 'getRenewalHistory']);
+});
+
+// Geolocation routes
+Route::prefix('geolocation')->group(function () {
+    Route::get('/nearby', [GeolocationController::class, 'searchNearby']);
+    Route::get('/by-city', [GeolocationController::class, 'searchByCity']);
+    Route::get('/popular-cities', [GeolocationController::class, 'getPopularCities']);
+    Route::post('/geocode', [GeolocationController::class, 'geocodeAddress']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/update', [GeolocationController::class, 'updateLocation']);
+    });
 });
 
 // Health check
