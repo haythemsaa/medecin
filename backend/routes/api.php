@@ -11,8 +11,10 @@ use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
 use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\PatientController;
+use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PrescriptionController;
 use App\Http\Controllers\API\ReviewController;
+use App\Http\Controllers\API\SearchController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -154,6 +156,24 @@ Route::middleware('auth:sanctum')->prefix('files')->group(function () {
     Route::get('/{id}', [FileController::class, 'show']);
     Route::get('/{id}/download', [FileController::class, 'download'])->name('files.download');
     Route::delete('/{id}', [FileController::class, 'destroy']);
+});
+
+// Payment routes (protected)
+Route::middleware('auth:sanctum')->prefix('payments')->group(function () {
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::post('/initiate', [PaymentController::class, 'initiatePayment']);
+    Route::post('/callback', [PaymentController::class, 'handleCallback']);
+    Route::get('/{id}', [PaymentController::class, 'show']);
+    Route::post('/{id}/confirm-cash', [PaymentController::class, 'confirmCashPayment']);
+    Route::post('/{id}/request-refund', [PaymentController::class, 'requestRefund']);
+    Route::post('/{id}/process-refund', [PaymentController::class, 'processRefund']);
+});
+
+// Search routes (public)
+Route::prefix('search')->group(function () {
+    Route::get('/medecins', [SearchController::class, 'searchMedecins']);
+    Route::get('/autocomplete', [SearchController::class, 'autocomplete']);
+    Route::get('/filters', [SearchController::class, 'getFilters']);
 });
 
 // Health check

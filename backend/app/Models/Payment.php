@@ -4,72 +4,66 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'patient_id',
         'appointment_id',
-        'transaction_id',
-        'payment_method',
+        'user_id',
         'amount',
-        'medecin_amount',
-        'platform_commission',
-        'vat_amount',
+        'payment_method',
         'status',
-        'payment_details',
+        'transaction_id',
+        'gateway_reference',
         'paid_at',
-        'refunded_at',
-        'refund_amount',
+        'payment_metadata',
+        'refund_status',
         'refund_reason',
-        'invoice_number',
-        'invoice_pdf_path',
+        'refund_requested_at',
+        'refund_processed_at',
+        'refund_admin_notes',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
-        'medecin_amount' => 'decimal:2',
-        'platform_commission' => 'decimal:2',
-        'vat_amount' => 'decimal:2',
-        'refund_amount' => 'decimal:2',
         'paid_at' => 'datetime',
-        'refunded_at' => 'datetime',
+        'refund_requested_at' => 'datetime',
+        'refund_processed_at' => 'datetime',
+        'payment_metadata' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    const PLATFORM_COMMISSION_RATE = 0.15; // 15%
-    const VAT_RATE = 0.19; // 19%
-
-    public function patient()
-    {
-        return $this->belongsTo(Patient::class);
-    }
-
-    public function appointment()
+    public function appointment(): BelongsTo
     {
         return $this->belongsTo(Appointment::class);
     }
 
-    public function calculateCommissions(float $amount): void
+    public function user(): BelongsTo
     {
-        $this->amount = $amount;
-        $this->platform_commission = $amount * self::PLATFORM_COMMISSION_RATE;
-        $this->medecin_amount = $amount - $this->platform_commission;
-        $this->vat_amount = $amount * self::VAT_RATE;
+        return $this->belongsTo(User::class);
     }
 
-    protected static function boot()
+    public function isCompleted(): bool
     {
-        parent::boot();
+        return $this->status === 'completed';
+    }
 
-        static::creating(function ($payment) {
-            if (!$payment->transaction_id) {
-                $payment->transaction_id = 'TXN-' . strtoupper(uniqid());
-            }
-            if (!$payment->invoice_number) {
-                $payment->invoice_number = 'INV-' . date('Y') . '-' . str_pad($payment->id ?? 1, 6, '0', STR_PAD_LEFT);
-            }
-        });
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function hasFailed(): bool
+    {
+        return $this->status === 'failed';
+    }
+
+    public function canBeRefunded(): bool
+    {
+        return $this->status === 'completed' && $this->refund_status !== 'completed';
     }
 }
