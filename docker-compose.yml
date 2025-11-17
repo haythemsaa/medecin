@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: sehadigital_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sehadigital
+      POSTGRES_USER: sehadigital
+      POSTGRES_PASSWORD: sehadigital_secure_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sehadigital
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: sehadigital_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sehadigital
+
+  # Laravel Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: sehadigital_backend
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=sehadigital
+      - DB_USERNAME=sehadigital
+      - DB_PASSWORD=sehadigital_secure_password
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - sehadigital
+
+  # Vue.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: sehadigital_frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    networks:
+      - sehadigital
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: sehadigital_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend:/var/www
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/sites/:/etc/nginx/conf.d/
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - sehadigital
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  sehadigital:
+    driver: bridge
