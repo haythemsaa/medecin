@@ -6,10 +6,12 @@ use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AvailabilityController;
 use App\Http\Controllers\API\ConsultationController;
+use App\Http\Controllers\API\ExportController;
 use App\Http\Controllers\API\FileController;
 use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
 use App\Http\Controllers\API\MessageController;
+use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PatientController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PrescriptionController;
@@ -174,6 +176,21 @@ Route::prefix('search')->group(function () {
     Route::get('/medecins', [SearchController::class, 'searchMedecins']);
     Route::get('/autocomplete', [SearchController::class, 'autocomplete']);
     Route::get('/filters', [SearchController::class, 'getFilters']);
+});
+
+// Export routes (protected)
+Route::middleware('auth:sanctum')->prefix('export')->group(function () {
+    Route::get('/appointments', [ExportController::class, 'exportAppointments']);
+    Route::get('/consultations', [ExportController::class, 'exportConsultations']);
+    Route::get('/payments', [ExportController::class, 'exportPayments']);
+    Route::get('/reviews', [ExportController::class, 'exportReviews']);
+});
+
+// Notification routes (protected)
+Route::middleware('auth:sanctum')->prefix('notifications')->group(function () {
+    Route::get('/preferences', [NotificationController::class, 'getPreferences']);
+    Route::put('/preferences', [NotificationController::class, 'updatePreferences']);
+    Route::post('/test', [NotificationController::class, 'testNotification']);
 });
 
 // Health check
