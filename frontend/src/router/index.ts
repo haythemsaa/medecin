@@ -95,8 +95,20 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/profile/medecin',
-    name: 'MedecinProfile',
+    name: 'MedecinProfilePage',
     component: () => import('@/views/profile/MedecinProfilePage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/medecin/availability',
+    name: 'AvailabilityManagement',
+    component: () => import('@/views/medecins/AvailabilityManagement.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/medecin/analytics',
+    name: 'DashboardAnalytics',
+    component: () => import('@/views/analytics/DashboardAnalytics.vue'),
     meta: { requiresAuth: true }
   }
 ]

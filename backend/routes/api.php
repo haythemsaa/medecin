@@ -1,14 +1,18 @@
 <?php
 
 use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\AnalyticsController;
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\AvailabilityController;
 use App\Http\Controllers\API\ConsultationController;
+use App\Http\Controllers\API\FileController;
 use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
 use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\PatientController;
 use App\Http\Controllers\API\PrescriptionController;
+use App\Http\Controllers\API\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -108,6 +112,48 @@ Route::middleware('auth:sanctum')->prefix('messages')->group(function () {
     Route::get('/conversations/{id}/messages', [MessageController::class, 'getMessages']);
     Route::post('/conversations/{id}/messages', [MessageController::class, 'sendMessage']);
     Route::get('/unread-count', [MessageController::class, 'getUnreadCount']);
+});
+
+// Availability routes (protected)
+Route::middleware('auth:sanctum')->prefix('availabilities')->group(function () {
+    Route::get('/', [AvailabilityController::class, 'index']);
+    Route::post('/', [AvailabilityController::class, 'store']);
+    Route::put('/{id}', [AvailabilityController::class, 'update']);
+    Route::delete('/{id}', [AvailabilityController::class, 'destroy']);
+    Route::post('/{id}/toggle', [AvailabilityController::class, 'toggle']);
+    Route::delete('/medecins/all', [AvailabilityController::class, 'destroyAll']);
+    Route::get('/medecins/{medecinId}/slots', [AvailabilityController::class, 'getAvailableSlots']);
+});
+
+// Review routes (protected)
+Route::middleware('auth:sanctum')->prefix('reviews')->group(function () {
+    Route::get('/medecins/{medecinId}', [ReviewController::class, 'index']);
+    Route::post('/', [ReviewController::class, 'store']);
+    Route::put('/{id}', [ReviewController::class, 'update']);
+    Route::delete('/{id}', [ReviewController::class, 'destroy']);
+    Route::post('/{id}/report', [ReviewController::class, 'report']);
+});
+
+// Analytics routes (protected - medecin only)
+Route::middleware('auth:sanctum')->prefix('analytics')->group(function () {
+    Route::get('/overview', [AnalyticsController::class, 'getOverview']);
+    Route::get('/revenue', [AnalyticsController::class, 'getRevenue']);
+    Route::get('/consultations-by-status', [AnalyticsController::class, 'getConsultationsByStatus']);
+    Route::get('/consultations-by-month', [AnalyticsController::class, 'getConsultationsByMonth']);
+    Route::get('/patients-by-age', [AnalyticsController::class, 'getPatientsByAge']);
+    Route::get('/satisfaction', [AnalyticsController::class, 'getSatisfaction']);
+    Route::get('/appointment-trends', [AnalyticsController::class, 'getAppointmentTrends']);
+    Route::get('/top-diagnoses', [AnalyticsController::class, 'getTopDiagnoses']);
+});
+
+// File routes (protected)
+Route::middleware('auth:sanctum')->prefix('files')->group(function () {
+    Route::get('/', [FileController::class, 'index']);
+    Route::post('/upload', [FileController::class, 'upload'])->name('files.upload');
+    Route::post('/upload-multiple', [FileController::class, 'uploadMultiple']);
+    Route::get('/{id}', [FileController::class, 'show']);
+    Route::get('/{id}/download', [FileController::class, 'download'])->name('files.download');
+    Route::delete('/{id}', [FileController::class, 'destroy']);
 });
 
 // Health check
