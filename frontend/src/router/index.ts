@@ -58,6 +58,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/consultations/:id/notes',
+    name: 'ConsultationNotes',
+    component: () => import('@/views/consultations/ConsultationNotesPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/messages',
     name: 'Messages',
     component: () => import('@/views/messages/MessagesPage.vue'),
@@ -68,6 +74,30 @@ const routes: RouteRecordRaw[] = [
     name: 'Admin',
     component: () => import('@/views/admin/AdminDashboard.vue'),
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/medical-record',
+    name: 'MedicalRecord',
+    component: () => import('@/views/medical-records/MedicalRecordPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/prescriptions',
+    name: 'Prescriptions',
+    component: () => import('@/views/prescriptions/PrescriptionsPage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile/patient',
+    name: 'PatientProfile',
+    component: () => import('@/views/profile/PatientProfilePage.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile/medecin',
+    name: 'MedecinProfile',
+    component: () => import('@/views/profile/MedecinProfilePage.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

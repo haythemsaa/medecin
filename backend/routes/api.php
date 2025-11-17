@@ -8,6 +8,7 @@ use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
 use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\PatientController;
+use App\Http\Controllers\API\PrescriptionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -78,6 +79,15 @@ Route::middleware('auth:sanctum')->prefix('medical-records')->group(function () 
 
     // Medecin routes
     Route::get('/patients/{patientId}', [MedicalRecordController::class, 'access']);
+});
+
+// Prescription routes (protected)
+Route::middleware('auth:sanctum')->prefix('prescriptions')->group(function () {
+    Route::get('/my-prescriptions', [PrescriptionController::class, 'myPrescriptions']);
+    Route::get('/medecin-prescriptions', [PrescriptionController::class, 'medecinPrescriptions']);
+    Route::get('/{id}', [PrescriptionController::class, 'show']);
+    Route::get('/{id}/download', [PrescriptionController::class, 'download']);
+    Route::post('/verify', [PrescriptionController::class, 'verify']);
 });
 
 // Admin routes (protected)
