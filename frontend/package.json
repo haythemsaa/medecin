@@ -1,6 +1,6 @@
 {
   "name": "sehadigital-frontend",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "description": "Seha Digital - Frontend Vue.js Application",
   "private": true,
   "scripts": {
@@ -15,7 +15,8 @@
     "pinia": "^2.1.7",
     "axios": "^1.6.0",
     "@headlessui/vue": "^1.7.0",
-    "@heroicons/vue": "^2.1.0"
+    "@heroicons/vue": "^2.1.0",
+    "leaflet": "^1.9.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
@@ -28,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
-    "eslint-plugin-vue": "^9.0.0"
+    "eslint-plugin-vue": "^9.0.0",
+    "@types/leaflet": "^1.9.8"
   }
 }
