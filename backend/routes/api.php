@@ -7,6 +7,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AvailabilityController;
 use App\Http\Controllers\API\ConsultationController;
 use App\Http\Controllers\API\ExportController;
+use App\Http\Controllers\API\FavoriteController;
 use App\Http\Controllers\API\FileController;
 use App\Http\Controllers\API\MedecinController;
 use App\Http\Controllers\API\MedicalRecordController;
@@ -191,6 +192,15 @@ Route::middleware('auth:sanctum')->prefix('notifications')->group(function () {
     Route::get('/preferences', [NotificationController::class, 'getPreferences']);
     Route::put('/preferences', [NotificationController::class, 'updatePreferences']);
     Route::post('/test', [NotificationController::class, 'testNotification']);
+});
+
+// Favorites routes (protected)
+Route::middleware('auth:sanctum')->prefix('favorites')->group(function () {
+    Route::get('/', [FavoriteController::class, 'index']);
+    Route::post('/', [FavoriteController::class, 'store']);
+    Route::put('/{id}', [FavoriteController::class, 'update']);
+    Route::delete('/{id}', [FavoriteController::class, 'destroy']);
+    Route::get('/check/{medecinId}', [FavoriteController::class, 'check']);
 });
 
 // Health check
