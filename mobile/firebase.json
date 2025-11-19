@@ -1,0 +1,13 @@
+{
+  "react-native": {
+    "analytics_auto_collection_enabled": true,
+    "crashlytics_debug_enabled": false,
+    "crashlytics_ndk_enabled": true
+  },
+  "android": {
+    "googleServicesFile": "./google-services.json"
+  },
+  "ios": {
+    "googleServicesFile": "./GoogleService-Info.plist"
+  }
+}
