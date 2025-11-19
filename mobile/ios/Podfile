@@ -1,0 +1,84 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'SehaDigitalMobile' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => true,
+    :fabric_enabled => false,
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  # React Native Maps
+  pod 'react-native-google-maps', :path => '../node_modules/react-native-maps'
+  pod 'GoogleMaps'
+  pod 'Google-Maps-iOS-Utils'
+
+  # React Native WebRTC
+  pod 'react-native-webrtc', :path => '../node_modules/react-native-webrtc'
+
+  # React Native Vector Icons
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+  # React Native Async Storage
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
+
+  # React Native Safe Area Context
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+
+  # React Native Screens
+  pod 'RNScreens', :path => '../node_modules/react-native-screens'
+
+  # React Native Gesture Handler
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
+  # React Native Reanimated
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+
+  # React Native Image Picker
+  pod 'RNImagePicker', :path => '../node_modules/react-native-image-picker'
+
+  # React Native Permissions
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
+  # Notifee for notifications
+  pod 'RNNotifee', :path => '../node_modules/@notifee/react-native'
+
+  target 'SehaDigitalMobileTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  post_install do |installer|
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
+
+    # Fix for Xcode 15
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+        config.build_settings['CODE_SIGN_IDENTITY'] = ''
+      end
+    end
+  end
+end
